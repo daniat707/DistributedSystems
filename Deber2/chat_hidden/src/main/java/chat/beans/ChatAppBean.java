@@ -31,14 +31,15 @@ public class ChatAppBean implements Serializable {
 
     // Grupos de usuarios
     private List<String> userGroups = new ArrayList<>(Arrays.asList("todos"));
-    private String selectedGroup = "todos"; // Default group
     private String newGroupName; // New group name
 
     // Add user to recipients
     public void registerUser(){
         String loggedInUser = login.getName();
+        // Associate user with 'todos' group
+        login.setCurrentGroup("todos");
         if (loggedInUser != null && !recipients.contains(loggedInUser)) {
-            recipients.add(loggedInUser);  // Añadir usuario a la lista
+            recipients.add(loggedInUser);  // Add user to the list of recipients
             System.out.println("Registered user: " + loggedInUser);
         }
     }
@@ -62,39 +63,21 @@ public class ChatAppBean implements Serializable {
         User newUser = new User();
         newUser.setUserName(login.getName() + ":   ");
         newUser.setMessage(message);
+        newUser.setGroupName(login.getCurrentGroup());
         this.message = "";
         usersToDisplay.add(newUser);
-        //push.send("updateNotifications", (Collection<String>) recipients);
-
-        // Enviar el mensaje solo a los usuarios del grupo seleccionado
-        if ("todos".equals(selectedGroup)) {
-            // Si el grupo es "todos", enviar el mensaje a todos los usuarios
-            //push.send("updateNotifications", newUser.getMessage()); // reemp recipients(?
-            push.send("updateNotifications", (Collection<String>) recipients);
-        } else {
-            // Si es un grupo específico, enviar solo a ese grupo
-            push.send(selectedGroup + selectedGroup, recipients);
-        }
-
+        push.send("updateNotifications", (Collection<String>) recipients);
     }
 
     // Metodo para crear o unirse a un grupo
     public void joinOrCreateGroup() {
         if (newGroupName != null && !newGroupName.trim().isEmpty()) {
             if (!userGroups.contains(newGroupName)) {
+                push.send("updateDropdown", recipients);
                 userGroups.add(newGroupName);  // Crea el grupo si no existe
             }
-            selectedGroup = newGroupName;  // Únete al grupo
             newGroupName = "";  // Resetea el campo de texto
         }
-    }
-
-    public String getSelectedGroup(){
-        return selectedGroup;
-    }
-
-    public void setSelectedGroup(String selectedGroup){
-        this.selectedGroup = selectedGroup;
     }
 
     public List<String> getUserGroups(){
@@ -114,7 +97,14 @@ public class ChatAppBean implements Serializable {
     }
 
     public List<User> getUsersToDisplay() {
-        return usersToDisplay;
+        // Filter the users to display based on the selected group
+        List<User> users = new ArrayList<>();
+        for (User user : usersToDisplay){
+            if (login.getCurrentGroup().equals(user.getGroupName())){
+                users.add(user);
+            }
+        }
+        return users;
     }
 
     public void setUsersToDisplay(List<User> usersToDisplay) {
@@ -137,4 +127,9 @@ public class ChatAppBean implements Serializable {
         return login.getName();
     }
 
+    public void printState(){
+        System.out.println("User: " + login.getName());
+        System.out.println("Current group: " + login.getCurrentGroup());
+        System.out.println("Available groups: " + userGroups);
+    }
 }

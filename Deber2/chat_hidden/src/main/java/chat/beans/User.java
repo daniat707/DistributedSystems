@@ -1,12 +1,10 @@
 package chat.beans;
 
-/**
- * @author Leonard
- */
 public class User {
 
     private String userName;
     private String message;
+    private String groupName;
 
     public User() {
     }
@@ -26,5 +24,13 @@ public class User {
 
     public void setMessage(String newMessage) {
         this.message = newMessage;
+    }
+
+    public void setGroupName(String groupName){
+        this.groupName = groupName;
+    }
+
+    public String getGroupName(){
+        return groupName;
     }
 }

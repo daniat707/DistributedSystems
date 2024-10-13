@@ -6,7 +6,7 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:f="http://xmlns.jcp.org/jsf/core">
 <h:head>
-    <title>Chat testtt</title>
+    <title>Chat test</title>
     <h:outputStylesheet library="css" name="style.css"/>
 </h:head>
 <h:body>
@@ -15,8 +15,9 @@
             <!--Dropdown para seleccionar grupos-->
             <h:panelGrid columns="2" cellpadding="5">
                 <h:outputLabel for="groupDropdown" value="Select Group:" />
-                <h:selectOneMenu id="groupDropdown" value="#{chatAppBean.selectedGroup}">
+                <h:selectOneMenu id="groupDropdown" value="#{user.currentGroup}">
                     <f:selectItems value="#{chatAppBean.userGroups}" var="group" itemValue="#{group}" itemLabel="#{group}" />
+                    <f:ajax event="change" render="msgTable"/>
                 </h:selectOneMenu>
 
                 <!-- Campo para agregar un nuevo grupo -->
@@ -27,6 +28,7 @@
                 <h:commandButton value="Create Group" action="#{chatAppBean.joinOrCreateGroup}">
                     <!-- Actualización del dropdown tras crear o unirse a un grupo -->
                     <f:ajax execute="newGroup" render="groupDropdown"/>
+                    <f:ajax execute="newGroup" render="newGroup"/>
                 </h:commandButton>
             </h:panelGrid>
 
@@ -64,6 +66,12 @@
     <h:form>
         <f:websocket channel="push" user="#{chatAppBean.name}">
             <f:ajax event="updateNotifications" render=":msgTable"/>
+        </f:websocket>
+    </h:form>
+
+    <h:form>
+        <f:websocket channel="push" user="#{chatAppBean.name}">
+            <f:ajax event="updateDropdown" render=":groupDropdown"/>
         </f:websocket>
     </h:form>
 

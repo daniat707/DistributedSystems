@@ -18,6 +18,7 @@ public class Login implements Serializable {
     private String name;
     private String password;
     private User user;
+    private String currentGroup;
     @Named
     @Inject
     private ChatAppBean chatAppBean;
@@ -53,6 +54,14 @@ public class Login implements Serializable {
 
     public void setPassword(String newValue) {
         password = newValue;
+    }
+
+    public String getCurrentGroup() {
+        return currentGroup;
+    }
+
+    public void setCurrentGroup(String newValue) {
+        currentGroup = newValue;
     }
 
     public String includeUser() {
